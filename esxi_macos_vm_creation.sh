@@ -1,5 +1,10 @@
 #!/bin/sh
 
+# tweaked by TravellingTechGuy on 17th of November 2018
+# added DEP (or 'Automated MDM enrollment') variables
+# added macOS Mojave OS version, set to default
+# added HW version 14 for ESXI 6.7
+#
 # Parameters: 
 #
 # Virtual machine name (required)
@@ -46,9 +51,9 @@ phelp() {
 	echo "n: Name of VM (required). If using a name with spaces and/or special characters, add quotation marks to the VM name."
 	echo "c: Number of virtual CPUs. Default number is two."
 	echo "d: Location of a VMDK disk file (required). Location must be in this format - /vmfs/volumes/datastore_number_here/path/to/vmdk_file.vmdk"
-	echo "h: VMware hardware version. ESXi 5.5 supports up to HW 10, ESXi 6.x supports up to HW 11 and ESXi 6.5 supports up to HW 13."
+	echo "h: VMware hardware version. ESXi 5.5 supports up to HW 10, ESXi 6.x supports up to HW 11 and ESXi 6.5 supports up to HW 13. And ESXi 6.7 supports up to HW 14."
 	echo "i: Location of an ISO image. Location must be in this format - /vmfs/volumes/datastore_number_here/path/to/iso_file.iso"
-	echo "o: Mac operating system version. Default is set to darwin14, which reports the guest OS as OS X Yosemite."
+	echo "o: Mac operating system version. Default is set to darwin18, which reports the guest OS as macOS Mojave."
 	echo ""
 	echo "VMware guest OS values for the following versions of OS X and macOS:"
 	echo ""
@@ -58,13 +63,15 @@ phelp() {
 	echo "OS 10.10 - darwin14-64"
 	echo "OS 10.11 - darwin15-64"
 	echo "macOS 10.12 - darwin16-64"
+	echo "macOS 10.13 - darwin17-64"
+	echo "macOS 10.14 - darwin18-64"
 	echo ""
 	echo "r: RAM size in MB. Default number is 4096, for 4 GBs of memory."
 	echo "s: Disk size in GB. Default size is 40 GB. You can specify if you want it to be larger."
 	echo "v: VNC port is between 5900 and 5909  (required if also using the -p option)"
 	echo "p: VNC password (required if also using the -v option). Maximum password length is eight characters."
 	echo ""
-	echo "Default script values: ESXi datastore location: /vmfs/volumes/datastore1, CPU: 2, RAM: 4096MB, Hard drive size: 40GB, Guest OS: darwin14-64, Hardware Version: 11"
+	echo "Default script values: ESXi datastore location: /vmfs/volumes/datastore1, CPU: 2, RAM: 4096MB, Hard drive size: 40GB, Guest OS: darwin18-64, Hardware Version: 14"
 	echo ""
 }
 
@@ -75,14 +82,18 @@ DATASTORE="/vmfs/volumes/datastore1"
 # Default variables. These values are overriden if alternate values
 # are enabled by the script's available options.
 
+# Change Serial and Model for Automated MDM enrollment to work!
+
 CPU=2
 RAM=4096
 SIZE=40
 ISO=""
-OSVERS="darwin14-64"
-HWVERS="11"
+OSVERS="darwin18-64"
+HWVERS="14"
 FLAG=true
 ERR=false
+SERIAL=C02SQWERTYUI
+MODEL=MacBookAir7,1
 
 # Error checking:
 #
@@ -316,6 +327,11 @@ RemoteDisplay.vnc.enabled = "${VNCSTATUS}"
 RemoteDisplay.vnc.port = "${VNCPORT}"
 RemoteDisplay.vnc.key = "${VNCPASS}"
 smc.present = "TRUE"
+serialNumber.reflectHost = "FALSE"
+serialNumber = "${SERIAL}"
+hw.model.reflectHost = "FALSE"
+hw.model = "${MODEL}"
+smbios.reflectHost = "FALSE"
 EOF
 
 else
@@ -358,6 +374,11 @@ ethernet0.present = "TRUE"
 usb.present = "TRUE"
 guestOS = "${OSVERS}"
 smc.present = "TRUE"
+serialNumber.reflectHost = "FALSE"
+serialNumber = "${SERIAL}"
+hw.model.reflectHost = "FALSE"
+hw.model = "${MODEL}"
+smbios.reflectHost = "FALSE"
 EOF
 
 fi
@@ -374,6 +395,8 @@ echo "RAM: ${RAM}"
 echo "Guest OS: ${OSVERS}"
 echo "Hardware Version: ${HWVERS}"
 echo "Hard drive size: ${SIZE}"
+echo "Serial number: ${SERIAL}"
+echo "Model: ${MODEL}"
 if [ -n "${ISO}" ]; then
 	echo "ISO: ${ISO}"
 else
