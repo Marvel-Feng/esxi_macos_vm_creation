@@ -1,3 +1,12 @@
+Forked from rtouten's script: https://github.com/rtrouton/esxi_macos_vm_creation
+
+Added serial number and model parameters to allow Automatic MDM enrollment (DEP)
+Updated macos Mojave and ESXI 6.7/HW14 references.
+
+Purpose: create an iOS Shortcut: https://travellingtechguy.eu/ios-shortcut-vm-esxi/
+
+
+
 This script is designed to create and configure virtual machines running Apple operating systems, hosted on a VMware ESXi server running on Apple hardware. The script assumes that the virtual machines are built using copied VMDK disk files.
 
 Script is designed to be stored on an ESXi datastore and run from the ESXi server's command line interface.
