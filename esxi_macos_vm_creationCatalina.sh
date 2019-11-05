@@ -6,7 +6,7 @@
 # added HW version 14 for ESXI 6.7
 #
 # tweaked by TravellingTechGuy on 5th of November 2019
-# added macOS Catalina OS version, set to default
+# added macOS Catalina OS version, set to NEW default
 # added HW version 15 for ESXI 6.7 U3
 #
 # Parameters: 
